@@ -1,22 +1,30 @@
 package com.beepscore.android.photogallery;
 
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.GridView;
 
+import java.io.IOException;
+
 /**
  * Created by stevebaker on 11/26/14.
  */
 public class PhotoGalleryFragment extends Fragment {
+    private static final String TAG = "PhotoGalleryFragment";
     GridView mGridView;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setRetainInstance(true);
+
+        // start async task
+        new FetchItemsTask().execute();
     }
 
     @Override
@@ -26,6 +34,20 @@ public class PhotoGalleryFragment extends Fragment {
         mGridView = (GridView)view.findViewById(R.id.gridView);
 
         return view;
+    }
+
+    private class FetchItemsTask extends AsyncTask<Void,Void,Void> {
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            try {
+                String result = new FlickrFetchr().getUrl("http://www.google.com");
+                Log.i(TAG, "Fetched contents of URL: " + result);
+            } catch (IOException ioException) {
+                Log.e(TAG, "Failed to fetch URL: " + ioException);
+            }
+            return null;
+        }
     }
 
 }
