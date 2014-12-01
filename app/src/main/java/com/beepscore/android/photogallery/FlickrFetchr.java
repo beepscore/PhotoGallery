@@ -15,7 +15,9 @@ import java.net.URL;
 public class FlickrFetchr {
     private static final String TAG = "FlickrFetchr";
 
-    private static final String ENDPOINT = "http://api.flickr.com/services/rest/";
+    // flickr requires https not http
+    // http://forums.bignerdranch.com/viewtopic.php?f=423&t=8944
+    private static final String ENDPOINT = "https://api.flickr.com/services/rest/";
 
     // get temporary key from
     // http://www.flickr.com/services/api/explore/?method=flickr.photos.search
@@ -63,7 +65,7 @@ public class FlickrFetchr {
             String url = Uri.parse(ENDPOINT).buildUpon()
                     .appendQueryParameter("method", METHOD_GET_RECENT)
                     .appendQueryParameter("api_key", API_KEY)
-//                    .appendQueryParameter(PARAM_EXTRAS, EXTRA_SMALL_URL)
+                    .appendQueryParameter(PARAM_EXTRAS, EXTRA_SMALL_URL)
                     .build().toString();
             String xmlString = getUrl(url);
             Log.i(TAG, "Received xml: " + xmlString);
