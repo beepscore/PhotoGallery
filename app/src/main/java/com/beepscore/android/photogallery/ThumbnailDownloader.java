@@ -27,8 +27,20 @@ public class ThumbnailDownloader<Token> extends HandlerThread {
     Map<Token, String> requestMap =
             Collections.synchronizedMap(new HashMap<Token, String>());
 
-    public ThumbnailDownloader() {
+    Handler mResponseHandler;
+    Listener<Token> mListener;
+
+    public interface Listener<Token> {
+        void onThumbnailDownloaded(Token token, Bitmap thumbnail);
+    }
+
+    public void setListener(Listener<Token> listener) {
+        mListener = listener;
+    }
+
+    public ThumbnailDownloader(Handler responseHandler) {
         super(TAG);
+        mResponseHandler = responseHandler;
     }
 
     // Java would warn about subclassing Handler.
@@ -73,8 +85,25 @@ public class ThumbnailDownloader<Token> extends HandlerThread {
             final Bitmap bitmap = BitmapFactory
                     .decodeByteArray(bitmapBytes, 0, bitmapBytes.length);
             Log.i(TAG, "Bitmap created");
+
+            mResponseHandler.post(new Runnable() {
+                @Override
+                public void run() {
+                    if (requestMap.get(token) != url) {
+                        return;
+                    }
+                    requestMap.remove(token);
+                    mListener.onThumbnailDownloaded(token, bitmap);
+                }
+            });
         } catch (IOException ioException) {
             Log.e(TAG, "Error downloading image", ioException);
         }
     }
+
+    public void clearQueue() {
+        mHandler.removeMessages(MESSAGE_DOWNLOAD);
+        requestMap.clear();
+    }
+
 }
