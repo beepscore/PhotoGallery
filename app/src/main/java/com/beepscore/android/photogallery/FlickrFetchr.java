@@ -31,7 +31,7 @@ public class FlickrFetchr {
     // Alternatively, register with Flickr for a developer key
     // http://www.flickr.com/services/api/keys/apply/
     // redirects to Yahoo login
-    private static final String API_KEY = "564285c7b559cf24d0715d8c29c9b3af";
+    private static final String API_KEY = "4294217a52b677f383d2cff9834e4c32";
 
     private static final String METHOD_GET_RECENT = "flickr.photos.getRecent";
     private static final String XML_PHOTO = "photo";
