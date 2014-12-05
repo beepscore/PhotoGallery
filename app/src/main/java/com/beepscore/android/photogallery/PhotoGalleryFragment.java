@@ -110,6 +110,9 @@ public class PhotoGalleryFragment extends Fragment {
             GalleryItem item = getItem(position);
             mThumbnailThread.queueThumbnail(imageView, item.getUrl());
 
+            // book returns convertView, but I expected it would return imageView.
+            // either one works. Is this because convertView contains only imageView?
+            // return convertView;
             return imageView;
         }
     }
