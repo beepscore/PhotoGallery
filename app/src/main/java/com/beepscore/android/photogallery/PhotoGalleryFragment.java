@@ -114,7 +114,18 @@ public class PhotoGalleryFragment extends Fragment {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_item_search:
-                getActivity().onSearchRequested();
+
+                //getActivity().onSearchRequested();
+
+                // Ch 28 Challenge 1 change from onSearchRequested to startSearch
+                // Note Android recommends use onSearchRequested
+                // https://developer.android.com/reference/android/app/Activity.html
+                // Book author says Challenge 1 isn't relevant when using Honeycomb SearchView
+                // http://forums.bignerdranch.com/viewtopic.php?f=425&t=6994
+                String query =  PreferenceManager.getDefaultSharedPreferences(getActivity())
+                        .getString(FlickrFetchr.PREF_SEARCH_QUERY, null);
+                getActivity().startSearch(query, true, null, false);
+
                 return true;
             case R.id.menu_item_clear:
                 return true;
