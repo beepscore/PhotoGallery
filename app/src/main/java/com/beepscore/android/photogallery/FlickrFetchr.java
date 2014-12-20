@@ -21,6 +21,8 @@ import java.util.ArrayList;
 public class FlickrFetchr {
     private static final String TAG = "FlickrFetchr";
 
+    public static final String PREF_SEARCH_QUERY = "searchQuery";
+
     // flickr requires https not http
     // http://forums.bignerdranch.com/viewtopic.php?f=423&t=8944
     private static final String ENDPOINT = "https://api.flickr.com/services/rest/";
