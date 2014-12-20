@@ -130,7 +130,14 @@ public class PhotoGalleryFragment extends Fragment {
          */
         @Override
         protected ArrayList<GalleryItem> doInBackground(Void... params) {
-            return new FlickrFetchr().fetchItems();
+            // just for testing
+            String query = "747";
+
+            if (query != null) {
+                return new FlickrFetchr().search(query);
+            } else {
+                return new FlickrFetchr().fetchItems();
+            }
         }
 
         /**
