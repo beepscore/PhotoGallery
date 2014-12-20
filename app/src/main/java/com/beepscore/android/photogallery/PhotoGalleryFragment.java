@@ -1,10 +1,12 @@
 package com.beepscore.android.photogallery;
 
+import android.app.Activity;
 import android.graphics.Bitmap;
 import android.media.Image;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
+import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -157,9 +159,14 @@ public class PhotoGalleryFragment extends Fragment {
          */
         @Override
         protected ArrayList<GalleryItem> doInBackground(Void... params) {
-            // just for testing
-            String query = "747";
 
+            Activity activity = getActivity();
+            if (activity == null) {
+                return new ArrayList<GalleryItem>();
+            }
+
+            String query =  PreferenceManager.getDefaultSharedPreferences(activity)
+                    .getString(FlickrFetchr.PREF_SEARCH_QUERY, null);
             if (query != null) {
                 return new FlickrFetchr().search(query);
             } else {
