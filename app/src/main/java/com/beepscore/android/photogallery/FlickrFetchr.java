@@ -34,9 +34,11 @@ public class FlickrFetchr {
     private static final String API_KEY = "d52e2ecb05fd09df61fa97991290b136";
 
     private static final String METHOD_GET_RECENT = "flickr.photos.getRecent";
+    private static final String METHOD_SEARCH = "flickr.photos.search";
     private static final String XML_PHOTO = "photo";
 
     private static final String PARAM_EXTRAS = "extras";
+    private static final String PARAM_TEXT = "text";
     private static final String EXTRA_SMALL_URL = "url_s";
 
     public byte[] getUrlBytes(String urlSpec) throws IOException {
@@ -73,6 +75,16 @@ public class FlickrFetchr {
                 .appendQueryParameter("method", METHOD_GET_RECENT)
                 .appendQueryParameter("api_key", API_KEY)
                 .appendQueryParameter(PARAM_EXTRAS, EXTRA_SMALL_URL)
+                .build().toString();
+        return downloadGalleryItems(url);
+    }
+
+    public ArrayList<GalleryItem> search(String query) {
+        String url = Uri.parse(ENDPOINT).buildUpon()
+                .appendQueryParameter("method", METHOD_SEARCH)
+                .appendQueryParameter("api_key", API_KEY)
+                .appendQueryParameter(PARAM_EXTRAS, EXTRA_SMALL_URL)
+                .appendQueryParameter(PARAM_TEXT, query)
                 .build().toString();
         return downloadGalleryItems(url);
     }
