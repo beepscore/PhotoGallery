@@ -21,7 +21,7 @@ import java.util.ArrayList;
 public class FlickrFetchr {
     private static final String TAG = "FlickrFetchr";
 
-    public static final String PREF_SEARCH_QUERY = "searchQuery";
+    public static final String PREF_SEARCH_QUERY = "PREF_SEARCH_QUERY";
 
     // flickr requires https not http
     // http://forums.bignerdranch.com/viewtopic.php?f=423&t=8944
@@ -37,11 +37,19 @@ public class FlickrFetchr {
 
     private static final String METHOD_GET_RECENT = "flickr.photos.getRecent";
     private static final String METHOD_SEARCH = "flickr.photos.search";
+    private static final String XML_PHOTOS = "photos";
+    private static final String XML_PHOTOS_TOTAL = "total";
     private static final String XML_PHOTO = "photo";
 
     private static final String PARAM_EXTRAS = "extras";
     private static final String PARAM_TEXT = "text";
     private static final String EXTRA_SMALL_URL = "url_s";
+
+    Integer mPhotosCount = 0;
+
+    public Integer getPhotosCount() {
+        return mPhotosCount;
+    }
 
     public byte[] getUrlBytes(String urlSpec) throws IOException {
         URL url = new URL(urlSpec);
@@ -115,6 +123,11 @@ public class FlickrFetchr {
         int eventType = parser.next();
 
         while (eventType != XmlPullParser.END_DOCUMENT) {
+            if (eventType == XmlPullParser.START_TAG &&
+                    XML_PHOTOS.equals(parser.getName())) {
+                String photosCountString = parser.getAttributeValue(null, XML_PHOTOS_TOTAL);
+                mPhotosCount = Integer.parseInt(photosCountString);
+            }
             if (eventType == XmlPullParser.START_TAG &&
                     XML_PHOTO.equals(parser.getName())) {
                 String id = parser.getAttributeValue(null, "id");

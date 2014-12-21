@@ -25,6 +25,7 @@ import android.widget.ArrayAdapter;
 import android.widget.GridView;
 import android.widget.ImageView;
 import android.widget.SearchView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 
@@ -36,6 +37,7 @@ public class PhotoGalleryFragment extends Fragment {
     GridView mGridView;
     ArrayList<GalleryItem> mItems;
     ThumbnailDownloader<ImageView> mThumbnailThread;
+    FlickrFetchr mFlickrFetchr;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -187,7 +189,7 @@ public class PhotoGalleryFragment extends Fragment {
             extends AsyncTask<Void,Void,ArrayList<GalleryItem>> {
 
         /**
-         * executes on background thread, so can't update UI safely
+         * Android calls on background thread, so can't update UI safely
          * Android won't let app update UI from a background thread
          */
         @Override
@@ -200,20 +202,28 @@ public class PhotoGalleryFragment extends Fragment {
 
             String query =  PreferenceManager.getDefaultSharedPreferences(activity)
                     .getString(FlickrFetchr.PREF_SEARCH_QUERY, null);
+
+            if (mFlickrFetchr == null) {
+                mFlickrFetchr = new FlickrFetchr();
+            }
+
             if (query != null) {
-                return new FlickrFetchr().search(query);
+                return mFlickrFetchr.search(query);
             } else {
-                return new FlickrFetchr().fetchItems();
+                return mFlickrFetchr.fetchItems();
             }
         }
 
         /**
-         * callback on main thread (UI thread), so can update UI safely
+         * Android calls back on main thread (UI thread), so can update UI safely
          */
         @Override
         protected void onPostExecute(ArrayList<GalleryItem> items) {
             mItems = items;
             setupAdapter();
+            Toast.makeText(getActivity(),
+                    "Result count " + mFlickrFetchr.getPhotosCount().toString(),
+                    Toast.LENGTH_SHORT).show();
         }
     }
 
