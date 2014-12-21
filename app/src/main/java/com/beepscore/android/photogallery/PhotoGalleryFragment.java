@@ -7,7 +7,6 @@ import android.app.SearchableInfo;
 import android.content.ComponentName;
 import android.content.Context;
 import android.graphics.Bitmap;
-import android.media.Image;
 import android.os.AsyncTask;
 import android.os.Build;
 import android.os.Bundle;
@@ -35,7 +34,7 @@ import java.util.ArrayList;
 public class PhotoGalleryFragment extends Fragment {
     private static final String TAG = "PhotoGalleryFragment";
     GridView mGridView;
-    ArrayList<GalleryItem> mItems;
+    Photos mPhotos;
     ThumbnailDownloader<ImageView> mThumbnailThread;
     FlickrFetchr mFlickrFetchr;
 
@@ -148,8 +147,11 @@ public class PhotoGalleryFragment extends Fragment {
             return;
         }
 
-        if (mItems != null) {
-            mGridView.setAdapter(new GalleryItemAdapter(mItems));
+        if (mPhotos == null) {
+            mPhotos = new Photos();
+        }
+        if (mPhotos.getItems() != null) {
+            mGridView.setAdapter(new GalleryItemAdapter(mPhotos.getItems()));
         } else {
             mGridView.setAdapter(null);
         }
@@ -186,18 +188,18 @@ public class PhotoGalleryFragment extends Fragment {
      * matches doInBackground return type and onPostExecute input type
      */
     private class FetchItemsTask
-            extends AsyncTask<Void,Void,ArrayList<GalleryItem>> {
+            extends AsyncTask<Void,Void,Photos> {
 
         /**
          * Android calls on background thread, so can't update UI safely
          * Android won't let app update UI from a background thread
          */
         @Override
-        protected ArrayList<GalleryItem> doInBackground(Void... params) {
+        protected Photos doInBackground(Void... params) {
 
             Activity activity = getActivity();
             if (activity == null) {
-                return new ArrayList<GalleryItem>();
+                return new Photos();
             }
 
             String query =  PreferenceManager.getDefaultSharedPreferences(activity)
@@ -218,11 +220,11 @@ public class PhotoGalleryFragment extends Fragment {
          * Android calls back on main thread (UI thread), so can update UI safely
          */
         @Override
-        protected void onPostExecute(ArrayList<GalleryItem> items) {
-            mItems = items;
+        protected void onPostExecute(Photos photos) {
+            mPhotos = photos;
             setupAdapter();
             Toast.makeText(getActivity(),
-                    "Result count " + mFlickrFetchr.getPhotosCount().toString(),
+                    "Result count " + String.valueOf(mPhotos.getCount()),
                     Toast.LENGTH_SHORT).show();
         }
     }

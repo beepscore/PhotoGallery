@@ -45,11 +45,7 @@ public class FlickrFetchr {
     private static final String PARAM_TEXT = "text";
     private static final String EXTRA_SMALL_URL = "url_s";
 
-    Integer mPhotosCount = 0;
-
-    public Integer getPhotosCount() {
-        return mPhotosCount;
-    }
+    Photos mPhotos;
 
     public byte[] getUrlBytes(String urlSpec) throws IOException {
         URL url = new URL(urlSpec);
@@ -80,7 +76,7 @@ public class FlickrFetchr {
         return new String(getUrlBytes(urlSpec));
     }
 
-    public ArrayList<GalleryItem> fetchItems() {
+    public Photos fetchItems() {
         String url = Uri.parse(ENDPOINT).buildUpon()
                 .appendQueryParameter("method", METHOD_GET_RECENT)
                 .appendQueryParameter("api_key", API_KEY)
@@ -89,7 +85,7 @@ public class FlickrFetchr {
         return downloadGalleryItems(url);
     }
 
-    public ArrayList<GalleryItem> search(String query) {
+    public Photos search(String query) {
         String url = Uri.parse(ENDPOINT).buildUpon()
                 .appendQueryParameter("method", METHOD_SEARCH)
                 .appendQueryParameter("api_key", API_KEY)
@@ -99,7 +95,8 @@ public class FlickrFetchr {
         return downloadGalleryItems(url);
     }
 
-    public ArrayList<GalleryItem> downloadGalleryItems(String url) {
+    public Photos downloadGalleryItems(String url) {
+        Photos photos = new Photos();
         ArrayList<GalleryItem> items = new ArrayList<GalleryItem>();
         try {
             String xmlString = getUrl(url);
@@ -108,25 +105,27 @@ public class FlickrFetchr {
             XmlPullParser parser = factory.newPullParser();
             parser.setInput(new StringReader(xmlString));
 
-            parseItems(items, parser);
-
+            photos = parseItems(items, parser);
         } catch (IOException ioException) {
             Log.e(TAG, "Failed to fetch items", ioException);
         } catch (XmlPullParserException xmlPullParserException) {
             Log.e(TAG, "Failed to parse items", xmlPullParserException);
         }
-        return items;
+        return photos;
     }
 
-    public void parseItems(ArrayList<GalleryItem> items, XmlPullParser parser)
+    public Photos parseItems(ArrayList<GalleryItem> items, XmlPullParser parser)
             throws XmlPullParserException, IOException {
+
+        Photos photos = new Photos();
+
         int eventType = parser.next();
 
         while (eventType != XmlPullParser.END_DOCUMENT) {
             if (eventType == XmlPullParser.START_TAG &&
                     XML_PHOTOS.equals(parser.getName())) {
                 String photosCountString = parser.getAttributeValue(null, XML_PHOTOS_TOTAL);
-                mPhotosCount = Integer.parseInt(photosCountString);
+                photos.setCount(Integer.parseInt(photosCountString));
             }
             if (eventType == XmlPullParser.START_TAG &&
                     XML_PHOTO.equals(parser.getName())) {
@@ -142,6 +141,8 @@ public class FlickrFetchr {
             }
             eventType = parser.next();
         }
+        photos.setItems(items);
+        return photos;
     }
 
 }
